@@ -1,0 +1,5 @@
+vtex/
+projects/*
+
+!projects/vtex.vcxproj
+!projects/vtex.vcxproj.filters

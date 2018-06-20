@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\..\include\vtex\feedback.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\..\..\include\vtex\final.frag">
+      <Filter>shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="shader">
+      <UniqueIdentifier>{807e1250-858a-4f04-a975-c89bb4682003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="page">
+      <UniqueIdentifier>{5d92b3c6-6e77-4be3-a8f6-243804f38403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="texture">
+      <UniqueIdentifier>{98ef942b-3bdb-4136-bda0-aa3e1997d764}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\vtex\Page.h">
+      <Filter>page</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\PageCache.h">
+      <Filter>page</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\PageIndexer.h">
+      <Filter>page</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\PageLoader.h">
+      <Filter>page</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\PageTable.h">
+      <Filter>page</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\FeedbackBuffer.h">
+      <Filter>texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\TextureAtlas.h">
+      <Filter>texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\TileDataFile.h">
+      <Filter>texture</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\PageCache.cpp">
+      <Filter>page</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\PageIndexer.cpp">
+      <Filter>page</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\PageLoader.cpp">
+      <Filter>page</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\PageTable.cpp">
+      <Filter>page</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\FeedbackBuffer.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\TextureAtlas.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\TileDataFile.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
