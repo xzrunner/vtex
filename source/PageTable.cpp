@@ -57,10 +57,10 @@ void PageTable::AddPage(const Page& page, int mapping_x, int mapping_y)
 			node = node->children[i].get();
 			break;
 		}
-
-		node->mapping_x = mapping_x;
-		node->mapping_y = mapping_y;
 	}
+
+	node->mapping_x = mapping_x;
+	node->mapping_y = mapping_y;
 }
 
 void PageTable::Update()
