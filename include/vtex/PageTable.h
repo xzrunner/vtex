@@ -17,6 +17,7 @@ public:
 	~PageTable();
 
 	void AddPage(const Page& page, int mapping_x, int mapping_y);
+	void RemovePage(const Page& page);
 
 	void Update();
 
@@ -63,6 +64,9 @@ private:
 		std::unique_ptr<QuadNode> children[4];
 
 	}; // QuadNode
+
+private:
+	QuadNode* FindPage(const Page& page, int& index) const;
 
 private:
 	int m_page_table_size;

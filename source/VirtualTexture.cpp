@@ -57,7 +57,7 @@ VirtualTexture::VirtualTexture(const std::string& filepath,
 	, m_indexer(m_info)
 	, m_loader(filepath, m_indexer)
 	, m_table(m_info.PageTableSize())
-	, m_cache(m_atlas, m_loader, m_table)
+	, m_cache(m_atlas, m_loader, m_table, m_indexer)
 	, m_feedback(feedback_size, m_info.PageTableSize(), m_indexer)
 	, m_mip_bias(MIP_SAMPLE_BIAS)
 {
@@ -89,6 +89,7 @@ void VirtualTexture::Draw(std::function<void()> draw_cb)
 
 	m_feedback.Download();
 	Update(m_feedback.GetRequests());
+	m_feedback.Clear();
 
 	m_feedback.UnbindRT();
 

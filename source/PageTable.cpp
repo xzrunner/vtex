@@ -63,6 +63,15 @@ void PageTable::AddPage(const Page& page, int mapping_x, int mapping_y)
 	node->mapping_y = mapping_y;
 }
 
+void PageTable::RemovePage(const Page& page)
+{
+	int index;
+	auto node = FindPage(page, index);
+	if (node != nullptr) {
+		node->children[index] = nullptr;
+	}
+}
+
 void PageTable::Update()
 {
 	int level = static_cast<int>(std::log2(m_page_table_size));
@@ -72,6 +81,49 @@ void PageTable::Update()
 		auto& rc = ur::Blackboard::Instance()->GetRenderContext();
 		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].size, m_data[i].size, 0, i, 0);
 	}
+}
+
+PageTable::QuadNode* PageTable::FindPage(const Page& page, int& index) const
+{
+	QuadNode* node = m_root.get();
+
+	int scale = 1 << page.mip;
+	int x = page.x * scale;
+	int y = page.y * scale;
+
+	bool exitloop = false;
+	while (!exitloop)
+	{
+		exitloop = true;
+
+		if (!node) {
+			int zz = 0;
+		}
+
+		for (int i = 0; i < 4; ++i)
+		{
+			if (node->children[i] != nullptr && node->children[i]->rect.Contain(x, y))
+			{
+				// We found it
+				if (page.mip == node->level - 1)
+				{
+					index = i;
+					return node;
+				}
+
+				// Check the children
+				else
+				{
+					node = node->children[i].get();
+					exitloop = false;
+				}
+			}
+		}
+	}
+
+	// We couldn't find it so it must not exist anymore
+	index = -1;
+	return nullptr;
 }
 
 /************************************************************************/
