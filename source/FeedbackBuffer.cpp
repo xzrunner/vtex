@@ -15,7 +15,7 @@ FeedbackBuffer::FeedbackBuffer(int size, int page_table_size,
 	, m_page_table_size(page_table_size)
 	, m_indexer(indexer)
 {
-	m_rt = std::make_unique<pt2::RenderTarget>(m_size, m_size);
+	m_rt = std::make_unique<pt2::RenderTarget>(m_size, m_size, true);
 	m_data = new uint8_t[m_size * m_size * 4];
 
 	m_requests.resize(indexer.GetPageCount(), 0);
