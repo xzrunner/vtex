@@ -44,6 +44,8 @@
     <ClInclude Include="..\..\..\include\vtex\TileDataFile.h">
       <Filter>texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\VirtualTexture.h" />
+    <ClInclude Include="..\..\..\include\vtex\VirtualTextureInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\PageCache.cpp">
@@ -67,5 +69,6 @@
     <ClCompile Include="..\..\..\source\TileDataFile.cpp">
       <Filter>texture</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\VirtualTexture.cpp" />
   </ItemGroup>
 </Project>
