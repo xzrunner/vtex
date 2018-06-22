@@ -26,6 +26,8 @@ public:
 
 	bool Request(const Page& page);
 
+	void Clear() { m_lru.clear(); }
+
 private:
 	struct PageWithPos
 	{
