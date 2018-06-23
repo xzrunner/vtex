@@ -31,13 +31,13 @@ void TileDataFile::WriteInfo()
 
 void TileDataFile::ReadPage(int index, uint8_t* data)
 {
-	m_file.seekg(DATA_OFFSET + m_tile_size * index);
+	m_file.seekg(DATA_OFFSET + static_cast<uint64_t>(m_tile_size) * index);
 	m_file.read(reinterpret_cast<char*>(data), m_tile_size);
 }
 
 void TileDataFile::WritePage(int index, const uint8_t* data)
 {
-	m_file.seekp(DATA_OFFSET + m_tile_size * index);
+	m_file.seekp(DATA_OFFSET + static_cast<uint64_t>(m_tile_size) * index);
 	m_file.write(reinterpret_cast<const char*>(data), m_tile_size);
 }
 
