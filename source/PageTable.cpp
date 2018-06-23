@@ -95,11 +95,6 @@ PageTable::QuadNode* PageTable::FindPage(const Page& page, int& index) const
 	while (!exitloop)
 	{
 		exitloop = true;
-
-		if (!node) {
-			int zz = 0;
-		}
-
 		for (int i = 0; i < 4; ++i)
 		{
 			if (node->children[i] != nullptr && node->children[i]->rect.Contain(x, y))

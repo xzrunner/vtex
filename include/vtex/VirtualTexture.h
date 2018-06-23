@@ -20,7 +20,7 @@ class VirtualTexture : private boost::noncopyable
 {
 public:
 	VirtualTexture(const std::string& filepath, const VirtualTextureInfo& info,
-		int atlas_channel, int feedback_size, int virtual_tex_size);
+		int atlas_channel, int feedback_size);
 
 	void Draw(std::function<void()> draw_cb);
 

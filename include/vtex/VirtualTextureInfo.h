@@ -12,6 +12,8 @@ struct VirtualTextureInfo : private boost::noncopyable
 	int border_size = 0;
 
 	VirtualTextureInfo() {}
+	VirtualTextureInfo(const VirtualTextureInfo& info)
+		: virtual_texture_size(info.virtual_texture_size), tile_size(info.tile_size), border_size(info.border_size) {}
 	VirtualTextureInfo(int virtual_texture_size, int tile_size, int border_size)
 		: virtual_texture_size(virtual_texture_size), tile_size(tile_size), border_size(border_size) {}
 

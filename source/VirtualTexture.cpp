@@ -46,13 +46,12 @@ namespace vtex
 {
 
 VirtualTexture::VirtualTexture(const std::string& filepath,
-	                           const VirtualTextureInfo& m_info,
+	                           const VirtualTextureInfo& info,
 	                           int atlas_channel,
-	                           int feedback_size,
-	                           int virtual_tex_size)
+	                           int feedback_size)
 	: m_feedback_size(feedback_size)
-	, m_virtual_tex_size(virtual_tex_size)
-	, m_info(virtual_tex_size, 128, 1)
+	, m_virtual_tex_size(info.virtual_texture_size)
+	, m_info(info)
 	, m_atlas(ATLAS_TEX_SIZE, m_info.PageSize(), atlas_channel)
 	, m_indexer(m_info)
 	, m_loader(filepath, m_indexer)
