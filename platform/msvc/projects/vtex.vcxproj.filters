@@ -18,6 +18,9 @@
     <Filter Include="texture">
       <UniqueIdentifier>{98ef942b-3bdb-4136-bda0-aa3e1997d764}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{609489c0-8186-40d5-8f32-7a9fba41e43e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\vtex\Page.h">
@@ -45,7 +48,12 @@
       <Filter>texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\vtex\VirtualTexture.h" />
-    <ClInclude Include="..\..\..\include\vtex\VirtualTextureInfo.h" />
+    <ClInclude Include="..\..\..\include\vtex\VirtualTextureInfo.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\vtex\Callback.h">
+      <Filter>tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\PageCache.cpp">
@@ -70,5 +78,8 @@
       <Filter>texture</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\VirtualTexture.cpp" />
+    <ClCompile Include="..\..\..\source\Callback.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

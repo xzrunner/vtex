@@ -69,12 +69,10 @@ bool PageCache::Request(const Page& page)
 {
 	if (m_lru.Find(page)) {
 		return false;
+	} else {
+		m_loader.LoadPage(page, *this);
+		return true;
 	}
-
-	auto data = m_loader.LoadPage(page);
-	LoadComplete(page, data);
-
-	return true;
 }
 
 /************************************************************************/

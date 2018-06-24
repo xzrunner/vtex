@@ -4,6 +4,7 @@
 
 #include <string>
 #include <fstream>
+#include <mutex>
 
 namespace vtex
 {
@@ -14,10 +15,10 @@ public:
 	TileDataFile(const std::string& filepath);
 	~TileDataFile();
 
-	void ReadInfo();
+	void ReadInfo() const;
 	void WriteInfo();
 
-	void ReadPage(int index, uint8_t* data);
+	void ReadPage(int index, uint8_t* data) const;
 	void WritePage(int index, const uint8_t* data);
 
 	const VirtualTextureInfo& GetVTexInfo() const { return m_vtex_info; }
@@ -29,11 +30,13 @@ private:
 	static const int DATA_OFFSET = 16;
 
 private:
-	VirtualTextureInfo m_vtex_info;
+	mutable VirtualTextureInfo m_vtex_info;
 
-	size_t m_tile_size;
+	mutable size_t m_tile_size;
 
-	std::fstream m_file;
+	mutable std::fstream m_file;
+
+	mutable std::mutex m_mutex;
 
 }; // TileDataFile
 

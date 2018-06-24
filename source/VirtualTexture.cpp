@@ -114,7 +114,7 @@ void VirtualTexture::DecreaseMipBias()
 	if (m_mip_bias < 0) {
 		m_mip_bias = 0;
 	}
-	m_feedback_shader->SetFloat("u_mip_sample_bias", m_mip_bias);
+	m_feedback_shader->SetFloat("u_mip_sample_bias", static_cast<float>(m_mip_bias));
 }
 
 void VirtualTexture::InitShaders()
@@ -135,7 +135,7 @@ void VirtualTexture::InitShaders()
 
 		m_feedback_shader->SetFloat("u_page_table_size", static_cast<float>(m_info.PageTableSize()));
 		m_feedback_shader->SetFloat("u_virt_tex_size", static_cast<float>(m_virtual_tex_size));
-		m_feedback_shader->SetFloat("u_mip_sample_bias", m_mip_bias);
+		m_feedback_shader->SetFloat("u_mip_sample_bias", static_cast<float>(m_mip_bias));
 	}
 	// final
 	{
@@ -197,7 +197,8 @@ void VirtualTexture::Update(const std::vector<int>& requests)
 		DecreaseMipBias();
 	}
 
-	// loader update
+	m_loader.Update();
+
 	m_table.Update();
 }
 
