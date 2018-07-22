@@ -122,9 +122,9 @@ void VirtualTexture::InitShaders()
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
 
 	CU_VEC<ur::VertexAttrib> layout;
-	layout.push_back(ur::VertexAttrib("position", 3, 4));
-	layout.push_back(ur::VertexAttrib("normal", 3, 4));
-	layout.push_back(ur::VertexAttrib("texcoord", 2, 4));
+	layout.push_back(ur::VertexAttrib("position", 3, 4, 32, 0));
+	layout.push_back(ur::VertexAttrib("normal",   3, 4, 32, 12));
+	layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 32, 24));
 
 	// feedback
 	{
