@@ -79,7 +79,7 @@ void PageTable::Update()
 	{
 		m_root->Write(m_data[i].size, m_data[i].data, i);
 		auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].size, m_data[i].size, 0, i, 0);
+		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].size, m_data[i].size, 0, i, ur::TEXTURE_FILTER_NEAREST);
 	}
 }
 
