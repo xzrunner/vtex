@@ -11,27 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\vtex\Callback.h" />
     <ClInclude Include="..\..\..\include\vtex\FeedbackBuffer.h" />
-    <ClInclude Include="..\..\..\include\vtex\Page.h" />
     <ClInclude Include="..\..\..\include\vtex\PageCache.h" />
-    <ClInclude Include="..\..\..\include\vtex\PageIndexer.h" />
-    <ClInclude Include="..\..\..\include\vtex\PageLoader.h" />
     <ClInclude Include="..\..\..\include\vtex\PageTable.h" />
     <ClInclude Include="..\..\..\include\vtex\TextureAtlas.h" />
-    <ClInclude Include="..\..\..\include\vtex\TileDataFile.h" />
     <ClInclude Include="..\..\..\include\vtex\VirtualTexture.h" />
-    <ClInclude Include="..\..\..\include\vtex\VirtualTextureInfo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\source\Callback.cpp" />
     <ClCompile Include="..\..\..\source\FeedbackBuffer.cpp" />
     <ClCompile Include="..\..\..\source\PageCache.cpp" />
-    <ClCompile Include="..\..\..\source\PageIndexer.cpp" />
-    <ClCompile Include="..\..\..\source\PageLoader.cpp" />
     <ClCompile Include="..\..\..\source\PageTable.cpp" />
     <ClCompile Include="..\..\..\source\TextureAtlas.cpp" />
-    <ClCompile Include="..\..\..\source\TileDataFile.cpp" />
     <ClCompile Include="..\..\..\source\VirtualTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -40,7 +30,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>3.vtex</ProjectName>
-    <ProjectGuid>{D9B1B541-5BCC-4A5F-8A7A-2CED3CEAD3DD}</ProjectGuid>
+    <ProjectGuid>{EB17C700-1495-4066-9722-D62B71C0C55A}</ProjectGuid>
     <RootNamespace>vtex</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
@@ -81,7 +71,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -95,7 +85,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

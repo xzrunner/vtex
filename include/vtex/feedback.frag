@@ -1,12 +1,12 @@
 static const char* feedback_frag = R"(
 
-uniform float u_page_table_size;
-uniform float u_virt_tex_size;
+uniform vec2 u_page_table_size;
+uniform vec2 u_virt_tex_size;
 uniform float u_mip_sample_bias;
 
 varying vec2 v_texcoord;
 
-float tex_mip_level(vec2 coord, float tex_size)
+float tex_mip_level(vec2 coord, vec2 tex_size)
 {
    vec2 dx_scaled, dy_scaled;
    vec2 coord_scaled = coord * tex_size;
@@ -24,9 +24,9 @@ float tex_mip_level(vec2 coord, float tex_size)
 void main()
 {
 	float mip = floor(tex_mip_level(v_texcoord, u_virt_tex_size) - u_mip_sample_bias);
-	mip = clamp(mip, 0, log2(u_page_table_size));
+	mip = clamp(mip, 0, log2(u_page_table_size.x));
 
-	float times = u_page_table_size / exp2(mip);
+	float times = u_page_table_size.x / exp2(mip);
 	vec2 offset = floor(v_texcoord * times);
 	offset = clamp(offset, vec2(0, 0), vec2(times - 1, times - 1));
 	gl_FragColor = vec4(vec3(offset / 255.0, mip / 255.0), 1.0);

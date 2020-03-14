@@ -5,19 +5,19 @@
 #include <memory>
 #include <vector>
 
+namespace textile { struct Page; }
+
 namespace vtex
 {
-
-struct Page;
 
 class PageTable : private boost::noncopyable
 {
 public:
-	PageTable(int page_table_size);
+	PageTable(int width, int height);
 	~PageTable();
 
-	void AddPage(const Page& page, int mapping_x, int mapping_y);
-	void RemovePage(const Page& page);
+	void AddPage(const textile::Page& page, int mapping_x, int mapping_y);
+	void RemovePage(const textile::Page& page);
 
 	void Update();
 
@@ -30,7 +30,7 @@ private:
 			delete[] data;
 		}
 
-		int size = 0;
+		int w = 0, h = 0;
 		uint8_t* data = nullptr;
 	};
 
@@ -54,7 +54,7 @@ private:
 
 		Rect CalcChildRect(int idx) const;
 
-		void Write(int size, uint8_t* data, int mip_level);
+		void Write(int w, int h, uint8_t* data, int mip_level);
 
 		int level;
 		Rect rect;
@@ -66,10 +66,12 @@ private:
 	}; // QuadNode
 
 private:
-	QuadNode* FindPage(const Page& page, int& index) const;
+	QuadNode* FindPage(const textile::Page& page, int& index) const;
+
+    size_t CalcMaxLevel() const;
 
 private:
-	int m_page_table_size;
+	int m_width, m_height;
 
 	std::unique_ptr<QuadNode> m_root;
 

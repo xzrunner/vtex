@@ -1,5 +1,4 @@
 #include "vtex/VirtualTexture.h"
-#include "vtex/VirtualTextureInfo.h"
 #include "vtex/feedback.frag"
 #include "vtex/final.frag"
 
@@ -7,7 +6,6 @@
 #include <unirender/RenderContext.h>
 #include <unirender/Shader.h>
 #include <painting2/DebugDraw.h>
-#include <painting3/EffectsManager.h>
 #include <painting3/Blackboard.h>
 #include <painting3/WindowContext.h>
 
@@ -46,18 +44,19 @@ namespace vtex
 {
 
 VirtualTexture::VirtualTexture(const std::string& filepath,
-	                           const VirtualTextureInfo& info,
+	                           const textile::VTexInfo& info,
 	                           int atlas_channel,
 	                           int feedback_size)
 	: m_feedback_size(feedback_size)
-	, m_virtual_tex_size(info.virtual_texture_size)
+	, m_vtex_w(info.vtex_width)
+    , m_vtex_h(info.vtex_height)
 	, m_info(info)
 	, m_atlas(ATLAS_TEX_SIZE, m_info.PageSize(), atlas_channel)
 	, m_indexer(m_info)
 	, m_loader(filepath, m_indexer)
-	, m_table(m_info.PageTableSize())
+	, m_table(m_info.PageTableWidth(), m_info.PageTableHeight())
 	, m_cache(m_atlas, m_loader, m_table, m_indexer)
-	, m_feedback(feedback_size, m_info.PageTableSize(), m_indexer)
+	, m_feedback(feedback_size, m_info.PageTableWidth(), m_info.PageTableHeight(), m_indexer)
 	, m_mip_bias(MIP_SAMPLE_BIAS)
 {
 	InitShaders();
@@ -69,7 +68,7 @@ void VirtualTexture::Draw(std::function<void()> draw_cb)
 
 	// pass 1
 
-	pt3::EffectsManager::Instance()->SetUserEffect(m_feedback_shader);
+	//pt3::EffectsManager::Instance()->SetUserEffect(m_feedback_shader);
 
 	m_feedback.BindRT();
 
@@ -80,9 +79,10 @@ void VirtualTexture::Draw(std::function<void()> draw_cb)
 
 	rc.SetViewport(0, 0, m_feedback_size, m_feedback_size);
 
-	rc.SetDepthFormat(ur::DEPTH_LESS_EQUAL);
+	rc.SetZTest(ur::DEPTH_LESS_EQUAL);
 	rc.SetClearFlag(ur::MASKC | ur::MASKD);
-	rc.Clear(0);
+    rc.SetClearColor(0);
+	rc.Clear();
 
 	draw_cb();
 
@@ -95,9 +95,10 @@ void VirtualTexture::Draw(std::function<void()> draw_cb)
 	rc.SetViewport(0, 0, screen_sz.x, screen_sz.y);
 
 	// pass 2
-	rc.Clear(0);
+	rc.Clear();
 
-	pt3::EffectsManager::Instance()->SetUserEffect(m_final_shader);
+//	pt3::EffectsManager::Instance()->SetUserEffect(m_final_shader);
+    m_final_shader->Use();
 	rc.BindTexture(m_table.GetTexID(), 0);
 	rc.BindTexture(m_atlas.GetTexID(), 1);
 	draw_cb();
@@ -126,6 +127,15 @@ void VirtualTexture::InitShaders()
 	layout.push_back(ur::VertexAttrib("normal",   3, 4, 32, 12));
 	layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 32, 24));
 
+    const float page_table_sz[2] = {
+        static_cast<float>(m_info.PageTableWidth()),
+        static_cast<float>(m_info.PageTableHeight())
+    };
+    const float vtex_sz[2] = {
+        static_cast<float>(m_vtex_w),
+        static_cast<float>(m_vtex_h)
+    };
+
 	// feedback
 	{
 		std::vector<std::string> textures;
@@ -133,8 +143,8 @@ void VirtualTexture::InitShaders()
 
 		m_feedback_shader->Use();
 
-		m_feedback_shader->SetFloat("u_page_table_size", static_cast<float>(m_info.PageTableSize()));
-		m_feedback_shader->SetFloat("u_virt_tex_size", static_cast<float>(m_virtual_tex_size));
+        m_feedback_shader->SetVec2("u_page_table_size", page_table_sz);
+        m_feedback_shader->SetVec2("u_virt_tex_size", vtex_sz);
 		m_feedback_shader->SetFloat("u_mip_sample_bias", static_cast<float>(m_mip_bias));
 	}
 	// final
@@ -147,8 +157,8 @@ void VirtualTexture::InitShaders()
 
 		m_final_shader->Use();
 
-		m_final_shader->SetFloat("u_page_table_size", static_cast<float>(m_info.PageTableSize()));
-		m_final_shader->SetFloat("u_virt_tex_size", static_cast<float>(m_virtual_tex_size));
+		m_final_shader->SetVec2("u_page_table_size", page_table_sz);
+		m_final_shader->SetVec2("u_virt_tex_size", vtex_sz);
 		m_final_shader->SetFloat("u_atlas_scale", static_cast<float>(m_info.PageSize()) / m_atlas.GetSize());
 
 		float page_size = static_cast<float>(m_info.PageSize());

@@ -3,8 +3,8 @@ static const char* final_frag = R"(
 uniform sampler2D u_page_table_tex;
 uniform sampler2D u_texture_atlas_tex;
 
-uniform float u_page_table_size;
-uniform float u_virt_tex_size;
+uniform vec2 u_page_table_size;
+uniform vec2 u_virt_tex_size;
 
 uniform float u_atlas_scale;		// This value is used to scale the uv to the texture atlas. It holds (PageSize/TextureAtlasSize)
 
@@ -13,7 +13,7 @@ uniform float u_border_offset;		// BorderSize/PageSize
 
 varying vec2 v_texcoord;
 
-float tex_mip_level(vec2 coord, float tex_size)
+float tex_mip_level(vec2 coord, vec2 tex_size)
 {
    vec2 dx_scaled, dy_scaled;
    vec2 coord_scaled = coord * tex_size;
@@ -53,7 +53,7 @@ vec4 sample_atlas(vec3 page, vec2 uv)
 vec4 bilinear_sample()
 {
 	float mip = floor(tex_mip_level(v_texcoord, u_virt_tex_size));
-	mip = clamp(mip, 0, log2(u_page_table_size));
+	mip = clamp(mip, 0, log2(u_page_table_size.x));
 
 	vec3 page = sample_table(v_texcoord, mip);
 	return sample_atlas(page, v_texcoord);
@@ -62,7 +62,7 @@ vec4 bilinear_sample()
 vec4 trilinear_sample()
 {
 	float miplevel = tex_mip_level(v_texcoord, u_virt_tex_size);
-	miplevel = clamp(miplevel, 0, log2(u_page_table_size) - 1);
+	miplevel = clamp(miplevel, 0, log2(u_page_table_size.x) - 1);
 
 	float mip1    = floor(miplevel);
 	float mip2	  = mip1 + 1;

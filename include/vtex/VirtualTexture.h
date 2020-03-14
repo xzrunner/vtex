@@ -1,12 +1,14 @@
 #pragma once
 
 #include "vtex/FeedbackBuffer.h"
-#include "vtex/Page.h"
 #include "vtex/TextureAtlas.h"
-#include "vtex/PageIndexer.h"
 #include "vtex/PageCache.h"
 #include "vtex/PageTable.h"
-#include "vtex/PageLoader.h"
+
+#include <textile/Page.h>
+#include <textile/VTexInfo.h>
+#include <textile/PageIndexer.h>
+#include <textile/PageLoader.h>
 
 #include <vector>
 #include <functional>
@@ -19,15 +21,18 @@ namespace vtex
 class VirtualTexture : private boost::noncopyable
 {
 public:
-	VirtualTexture(const std::string& filepath, const VirtualTextureInfo& info,
+	VirtualTexture(const std::string& filepath, const textile::VTexInfo& info,
 		int atlas_channel, int feedback_size);
 
 	void Draw(std::function<void()> draw_cb);
 
 	void ClearCache() { m_cache.Clear(); }
-	PageLoader& GetPageLoader() { return m_loader; }
+	textile::PageLoader& GetPageLoader() { return m_loader; }
 
 	void DecreaseMipBias();
+
+    auto Width() const { return m_vtex_w; }
+    auto Height() const { return m_vtex_h; }
 
 private:
 	void InitShaders();
@@ -37,31 +42,29 @@ private:
 private:
 	struct PageWithCount
 	{
-		PageWithCount(const Page& page, int count)
+		PageWithCount(const textile::Page& page, int count)
 			: page(page), count(count) {}
 
-		Page page;
+		textile::Page page;
 		int count = 0;
 	};
 
 private:
 	int m_feedback_size;
-	int m_virtual_tex_size;
+	int m_vtex_w, m_vtex_h;
 
-	VirtualTextureInfo m_info;
+	textile::VTexInfo m_info;
 
 	std::shared_ptr<ur::Shader> m_feedback_shader = nullptr;
 	std::shared_ptr<ur::Shader> m_final_shader = nullptr;
 
 	TextureAtlas m_atlas;
 
-	PageIndexer  m_indexer;
+	textile::PageIndexer m_indexer;
+	textile::PageLoader  m_loader;
 
-	PageLoader   m_loader;
-
-	PageTable    m_table;
-
-	PageCache    m_cache;
+	PageTable m_table;
+	PageCache m_cache;
 
 	FeedbackBuffer m_feedback;
 

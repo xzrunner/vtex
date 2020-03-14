@@ -1,33 +1,38 @@
 #include "vtex/PageTable.h"
-#include "vtex/Page.h"
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
+#include <textile/PageIndexer.h>
+
+#include <algorithm>
 
 #include <assert.h>
 
 namespace vtex
 {
 
-PageTable::PageTable(int page_table_size)
-	: m_page_table_size(page_table_size)
+PageTable::PageTable(int width, int height)
+	: m_width(width)
+    , m_height(height)
 {
-	int level = static_cast<int>(std::log2(m_page_table_size));
-	m_root = std::make_unique<QuadNode>(level, Rect(0, 0, m_page_table_size, m_page_table_size));
+    const auto level = CalcMaxLevel();
+	m_root = std::make_unique<QuadNode>(level, Rect(0, 0, m_width, m_height));
 
 	m_data.resize(level + 1);
-	for (int i = 0; i < level + 1; ++i)
+	for (size_t i = 0; i < level + 1; ++i)
 	{
-		int size = page_table_size >> i;
+		int sw = width >> i;
+        int sh = height >> i;
 
 		auto& data = m_data[i];
-		data.size = size;
-		data.data = new uint8_t[size * size * 4];
-		memset(data.data, 0, size * size * 4);
+		data.w = sw;
+        data.h = sh;
+		data.data = new uint8_t[sw * sh * 4];
+		memset(data.data, 0, sw * sh * 4);
 	}
 
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	m_texid = rc.CreateTextureID(m_page_table_size, m_page_table_size, ur::TEXTURE_RGBA8, 1);
+	m_texid = rc.CreateTextureID(m_width, m_height, ur::TEXTURE_RGBA8, 1);
 }
 
 PageTable::~PageTable()
@@ -36,7 +41,7 @@ PageTable::~PageTable()
 	rc.ReleaseTexture(m_texid);
 }
 
-void PageTable::AddPage(const Page& page, int mapping_x, int mapping_y)
+void PageTable::AddPage(const textile::Page& page, int mapping_x, int mapping_y)
 {
 	int scale = 1 << page.mip;
 	int x = page.x * scale;
@@ -63,7 +68,7 @@ void PageTable::AddPage(const Page& page, int mapping_x, int mapping_y)
 	node->mapping_y = mapping_y;
 }
 
-void PageTable::RemovePage(const Page& page)
+void PageTable::RemovePage(const textile::Page& page)
 {
 	int index;
 	auto node = FindPage(page, index);
@@ -74,16 +79,17 @@ void PageTable::RemovePage(const Page& page)
 
 void PageTable::Update()
 {
-	int level = static_cast<int>(std::log2(m_page_table_size));
-	for (int i = 0; i < level + 1; ++i)
+	const auto level = CalcMaxLevel();
+	for (size_t i = 0; i < level + 1; ++i)
 	{
-		m_root->Write(m_data[i].size, m_data[i].data, i);
+		m_root->Write(m_data[i].w, m_data[i].h, m_data[i].data, i);
 		auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].size, m_data[i].size, 0, i, ur::TEXTURE_FILTER_NEAREST);
+		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].w, m_data[i].h, 0, i, 
+            ur::TEXTURE_REPEAT, ur::TEXTURE_NEAREST);
 	}
 }
 
-PageTable::QuadNode* PageTable::FindPage(const Page& page, int& index) const
+PageTable::QuadNode* PageTable::FindPage(const textile::Page& page, int& index) const
 {
 	QuadNode* node = m_root.get();
 
@@ -119,6 +125,11 @@ PageTable::QuadNode* PageTable::FindPage(const Page& page, int& index) const
 	// We couldn't find it so it must not exist anymore
 	index = -1;
 	return nullptr;
+}
+
+size_t PageTable::CalcMaxLevel() const
+{
+    return static_cast<size_t>(std::min(std::log2(m_width), std::log2(m_height)));
 }
 
 /************************************************************************/
@@ -159,7 +170,7 @@ PageTable::Rect PageTable::QuadNode::CalcChildRect(int idx) const
 	}
 }
 
-void PageTable::QuadNode::Write(int size, uint8_t* data, int mip_level)
+void PageTable::QuadNode::Write(int w, int h, uint8_t* data, int mip_level)
 {
 	if (level < mip_level) {
 		return;
@@ -172,7 +183,7 @@ void PageTable::QuadNode::Write(int size, uint8_t* data, int mip_level)
 	int rh = rect.h >> mip_level;
 	for (int y = ry; y < ry + rh; ++y) {
 		for (int x = rx; x < rx + rw; ++x) {
-			int ptr = (y * size + x) * 4;
+			int ptr = (y * w + x) * 4;
 			data[ptr + 0] = mapping_x;
 			data[ptr + 1] = mapping_y;
 			data[ptr + 2] = level;
@@ -182,7 +193,7 @@ void PageTable::QuadNode::Write(int size, uint8_t* data, int mip_level)
 
 	for (int i = 0; i < 4; ++i) {
 		if (children[i] != nullptr) {
-			children[i]->Write(size, data, mip_level);
+			children[i]->Write(w, h, data, mip_level);
 		}
 	}
 }

@@ -1,18 +1,20 @@
 #include "vtex/FeedbackBuffer.h"
-#include "vtex/Page.h"
-#include "vtex/PageIndexer.h"
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
 #include <painting2/RenderTarget.h>
+#include <textile/PageIndexer.h>
+
+#include <algorithm>
 
 namespace vtex
 {
 
-FeedbackBuffer::FeedbackBuffer(int size, int page_table_size,
-	                           const PageIndexer& indexer)
+FeedbackBuffer::FeedbackBuffer(int size, int page_table_w, int page_table_h,
+	                           const textile::PageIndexer& indexer)
 	: m_size(size)
-	, m_page_table_size(page_table_size)
+	, m_page_table_w(page_table_w)
+    , m_page_table_h(page_table_h)
 	, m_indexer(indexer)
 {
 	m_rt = std::make_unique<pt2::RenderTarget>(m_size, m_size, true);
@@ -41,7 +43,7 @@ void FeedbackBuffer::Download()
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
 	rc.ReadPixels(m_data, 4, 0, 0, m_size, m_size);
 
-	int page_table_size_log2 = static_cast<int>(std::log2(m_page_table_size));
+    int page_table_size_log2 = static_cast<int>(std::log2(std::min(m_page_table_w, m_page_table_h)));
 	for (int i = 0, n = m_size * m_size; i < n; ++i)
 	{
 		if (m_data[i * 4 + 3] == 255)
@@ -55,7 +57,7 @@ void FeedbackBuffer::Download()
 				int _x = x >> j;
 				int _y = y >> j;
 				int _mip = mip + j;
-				int idx = m_indexer.CalcPageIdx(Page(_x, _y, _mip));
+				int idx = m_indexer.CalcPageIdx(textile::Page(_x, _y, _mip));
 				++m_requests[idx];
 			}
 

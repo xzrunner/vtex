@@ -6,18 +6,17 @@
 #include <memory>
 #include <vector>
 
+namespace textile { class PageIndexer; }
 namespace pt2 { class RenderTarget; }
 
 namespace vtex
 {
 
-class PageIndexer;
-
 class FeedbackBuffer : private boost::noncopyable
 {
 public:
-	FeedbackBuffer(int size, int page_table_size,
-		const PageIndexer& indexer);
+	FeedbackBuffer(int size, int page_table_w, int page_table_h,
+		const textile::PageIndexer& indexer);
 	~FeedbackBuffer();
 
 	void BindRT();
@@ -32,10 +31,10 @@ public:
 	uint32_t GetTexID() const;
 
 private:
-	const PageIndexer& m_indexer;
+	const textile::PageIndexer& m_indexer;
 
 	int m_size;
-	int m_page_table_size;
+	int m_page_table_w, m_page_table_h;
 
 	std::unique_ptr<pt2::RenderTarget> m_rt = nullptr;
 	uint8_t* m_data;
