@@ -2,9 +2,11 @@
 #include "vtex/feedback.frag"
 #include "vtex/final.frag"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
-#include <unirender/Shader.h>
+#include <unirender2/ShaderProgram.h>
+#include <unirender2/Device.h>
+#include <unirender2/Context.h>
+#include <unirender2/Uniform.h>
+#include <unirender2/Texture.h>
 #include <painting2/DebugDraw.h>
 #include <painting3/Blackboard.h>
 #include <painting3/WindowContext.h>
@@ -43,7 +45,8 @@ void main()
 namespace vtex
 {
 
-VirtualTexture::VirtualTexture(const std::string& filepath,
+VirtualTexture::VirtualTexture(const ur2::Device& dev,
+                               const std::string& filepath,
 	                           const textile::VTexInfo& info,
 	                           int atlas_channel,
 	                           int feedback_size)
@@ -51,61 +54,58 @@ VirtualTexture::VirtualTexture(const std::string& filepath,
 	, m_vtex_w(info.vtex_width)
     , m_vtex_h(info.vtex_height)
 	, m_info(info)
-	, m_atlas(ATLAS_TEX_SIZE, m_info.PageSize(), atlas_channel)
+	, m_atlas(dev, ATLAS_TEX_SIZE, m_info.PageSize(), atlas_channel)
 	, m_indexer(m_info)
 	, m_loader(filepath, m_indexer)
-	, m_table(m_info.PageTableWidth(), m_info.PageTableHeight())
+	, m_table(dev, m_info.PageTableWidth(), m_info.PageTableHeight())
 	, m_cache(m_atlas, m_loader, m_table, m_indexer)
-	, m_feedback(feedback_size, m_info.PageTableWidth(), m_info.PageTableHeight(), m_indexer)
+	, m_feedback(dev, feedback_size, m_info.PageTableWidth(), m_info.PageTableHeight(), m_indexer)
 	, m_mip_bias(MIP_SAMPLE_BIAS)
 {
-	InitShaders();
+	InitShaders(dev);
 }
 
-void VirtualTexture::Draw(std::function<void()> draw_cb)
+void VirtualTexture::Draw(const ur2::Device& dev, ur2::Context& ctx, std::function<void()> draw_cb)
 {
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-
 	// pass 1
 
 	//pt3::EffectsManager::Instance()->SetUserEffect(m_feedback_shader);
 
 	m_feedback.BindRT();
 
-	m_feedback_shader->Use();
+	//m_feedback_shader->Use();
 
-	auto& wc = pt3::Blackboard::Instance()->GetWindowContext();
-	auto screen_sz = wc->GetScreenSize();
+	//auto& wc = pt3::Blackboard::Instance()->GetWindowContext();
+	//auto screen_sz = wc->GetScreenSize();
 
-	rc.SetViewport(0, 0, m_feedback_size, m_feedback_size);
+	//rc.SetViewport(0, 0, m_feedback_size, m_feedback_size);
 
-	rc.SetZTest(ur::DEPTH_LESS_EQUAL);
-	rc.SetClearFlag(ur::MASKC | ur::MASKD);
-    rc.SetClearColor(0);
-	rc.Clear();
+	//rc.SetZTest(ur::DEPTH_LESS_EQUAL);
+	//rc.SetClearFlag(ur::MASKC | ur::MASKD);
+ //   rc.SetClearColor(0);
+	//rc.Clear();
 
 	draw_cb();
 
-	m_feedback.Download();
-	Update(m_feedback.GetRequests());
+	m_feedback.Download(dev);
+	Update(dev, m_feedback.GetRequests());
 	m_feedback.Clear();
 
 	m_feedback.UnbindRT();
 
-	rc.SetViewport(0, 0, screen_sz.x, screen_sz.y);
+//	rc.SetViewport(0, 0, screen_sz.x, screen_sz.y);
 
 	// pass 2
-	rc.Clear();
+//	rc.Clear();
 
 //	pt3::EffectsManager::Instance()->SetUserEffect(m_final_shader);
-    m_final_shader->Use();
-	rc.BindTexture(m_table.GetTexID(), 0);
-	rc.BindTexture(m_atlas.GetTexID(), 1);
+    ctx.SetTexture(m_final_shader->QueryTexSlot("u_page_table_tex"), m_table.GetTexture());
+    ctx.SetTexture(m_final_shader->QueryTexSlot("u_texture_atlas_tex"), m_atlas.GetTexture());
 	draw_cb();
 
 	// debug
-	pt2::DebugDraw::Draw(m_atlas.GetTexID(), 4);
-	pt2::DebugDraw::Draw(m_feedback.GetTexID(), 3);
+	pt2::DebugDraw::Draw(dev, ctx, m_atlas.GetTexture()->GetTexID(), 4);
+	pt2::DebugDraw::Draw(dev, ctx, m_feedback.GetTexture()->GetTexID(), 3);
 	//pt2::DebugDraw::Draw(virt_tex->GetPageTableTexID(), 2);
 }
 
@@ -115,17 +115,19 @@ void VirtualTexture::DecreaseMipBias()
 	if (m_mip_bias < 0) {
 		m_mip_bias = 0;
 	}
-	m_feedback_shader->SetFloat("u_mip_sample_bias", static_cast<float>(m_mip_bias));
+
+    auto u_mip_sample_bias = m_feedback_shader->QueryUniform("u_mip_sample_bias");
+    assert(u_mip_sample_bias);
+    float bias = static_cast<float>(m_mip_bias);
+    u_mip_sample_bias->SetValue(&bias, 1);
 }
 
-void VirtualTexture::InitShaders()
+void VirtualTexture::InitShaders(const ur2::Device& dev)
 {
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-
-	CU_VEC<ur::VertexAttrib> layout;
-	layout.push_back(ur::VertexAttrib("position", 3, 4, 32, 0));
-	layout.push_back(ur::VertexAttrib("normal",   3, 4, 32, 12));
-	layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 32, 24));
+	//CU_VEC<ur::VertexAttrib> layout;
+	//layout.push_back(ur::VertexAttrib("position", 3, 4, 32, 0));
+	//layout.push_back(ur::VertexAttrib("normal",   3, 4, 32, 12));
+	//layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 32, 24));
 
     const float page_table_sz[2] = {
         static_cast<float>(m_info.PageTableWidth()),
@@ -138,36 +140,58 @@ void VirtualTexture::InitShaders()
 
 	// feedback
 	{
-		std::vector<std::string> textures;
-		m_feedback_shader = std::make_shared<ur::Shader>(&rc, default_vs, feedback_frag, textures, layout);
+        m_feedback_shader = dev.CreateShaderProgram(default_vs, feedback_frag);
 
-		m_feedback_shader->Use();
+        auto u_page_table_size = m_feedback_shader->QueryUniform("u_page_table_size");
+        assert(u_page_table_size);
+        u_page_table_size->SetValue(page_table_sz, 2);
 
-        m_feedback_shader->SetVec2("u_page_table_size", page_table_sz);
-        m_feedback_shader->SetVec2("u_virt_tex_size", vtex_sz);
-		m_feedback_shader->SetFloat("u_mip_sample_bias", static_cast<float>(m_mip_bias));
+        auto u_virt_tex_size = m_feedback_shader->QueryUniform("u_virt_tex_size");
+        assert(u_virt_tex_size);
+        u_virt_tex_size->SetValue(vtex_sz, 2);
+
+        auto u_mip_sample_bias = m_feedback_shader->QueryUniform("u_mip_sample_bias");
+        assert(u_mip_sample_bias);
+        float bias = static_cast<float>(m_mip_bias);
+        u_mip_sample_bias->SetValue(&bias, 1);
 	}
 	// final
 	{
-		std::vector<std::string> textures;
-		textures.push_back("u_page_table_tex");
-		textures.push_back("u_texture_atlas_tex");
+		//std::vector<std::string> textures;
+		//textures.push_back("u_page_table_tex");
+		//textures.push_back("u_texture_atlas_tex");
 
-		m_final_shader = std::make_shared<ur::Shader>(&rc, default_vs, final_frag, textures, layout);
+        m_final_shader = dev.CreateShaderProgram(default_vs, final_frag);
 
-		m_final_shader->Use();
+        auto u_page_table_size = m_final_shader->QueryUniform("u_page_table_size");
+        assert(u_page_table_size);
+        u_page_table_size->SetValue(page_table_sz, 2);
 
-		m_final_shader->SetVec2("u_page_table_size", page_table_sz);
-		m_final_shader->SetVec2("u_virt_tex_size", vtex_sz);
-		m_final_shader->SetFloat("u_atlas_scale", static_cast<float>(m_info.PageSize()) / m_atlas.GetSize());
+        auto u_virt_tex_size = m_final_shader->QueryUniform("u_virt_tex_size");
+        assert(u_virt_tex_size);
+        u_virt_tex_size->SetValue(vtex_sz, 2);
+
+        auto u_atlas_scale = m_final_shader->QueryUniform("u_atlas_scale");
+        assert(u_atlas_scale);
+        float atlas_scale = static_cast<float>(m_info.PageSize()) / m_atlas.GetSize();
+        u_atlas_scale->SetValue(&atlas_scale, 1);
 
 		float page_size = static_cast<float>(m_info.PageSize());
-		m_final_shader->SetFloat("u_border_scale", (page_size - 2 * m_info.border_size) / page_size);
-		m_final_shader->SetFloat("u_border_offset", m_info.border_size / page_size);
+
+        auto u_border_scale = m_final_shader->QueryUniform("u_border_scale");
+        assert(u_border_scale);
+        float border_scale = (page_size - 2 * m_info.border_size) / page_size;
+        u_border_scale->SetValue(&border_scale, 1);
+
+        auto u_border_offset = m_final_shader->QueryUniform("u_border_offset");
+        assert(u_border_offset);
+        float border_offset = m_info.border_size / page_size;
+        u_border_offset->SetValue(&border_offset, 1);
 	}
 }
 
-void VirtualTexture::Update(const std::vector<int>& requests)
+void VirtualTexture::Update(const ur2::Device& dev,
+                            const std::vector<int>& requests)
 {
 	m_toload.clear();
 
@@ -199,7 +223,7 @@ void VirtualTexture::Update(const std::vector<int>& requests)
 
 		int load_n = std::min((int)m_toload.size(), UPLOADS_PER_FRAME);
 		for (int i = 0; i < load_n; ++i) {
-			m_cache.Request(m_toload[i].page);
+			m_cache.Request(dev, m_toload[i].page);
 		}
 	}
 	else
@@ -207,7 +231,7 @@ void VirtualTexture::Update(const std::vector<int>& requests)
 		DecreaseMipBias();
 	}
 
-	m_loader.Update();
+	m_loader.Update(dev);
 
 	m_table.Update();
 }

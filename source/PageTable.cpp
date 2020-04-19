@@ -1,7 +1,8 @@
 #include "vtex/PageTable.h"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
+#include <unirender2/Device.h>
+#include <unirender2/Texture.h>
+#include <unirender2/TextureDescription.h>
 #include <textile/PageIndexer.h>
 
 #include <algorithm>
@@ -11,7 +12,7 @@
 namespace vtex
 {
 
-PageTable::PageTable(int width, int height)
+PageTable::PageTable(const ur2::Device& dev, int width, int height)
 	: m_width(width)
     , m_height(height)
 {
@@ -31,14 +32,12 @@ PageTable::PageTable(int width, int height)
 		memset(data.data, 0, sw * sh * 4);
 	}
 
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	m_texid = rc.CreateTextureID(m_width, m_height, ur::TEXTURE_RGBA8, 1);
-}
-
-PageTable::~PageTable()
-{
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	rc.ReleaseTexture(m_texid);
+    ur2::TextureDescription desc;
+    desc.target = ur2::TextureTarget::Texture2D;
+    desc.width  = m_width;
+    desc.height = m_height;
+    desc.format = ur2::TextureFormat::RGBA8;
+    m_tex = dev.CreateTexture(desc, nullptr);
 }
 
 void PageTable::AddPage(const textile::Page& page, int mapping_x, int mapping_y)
@@ -83,9 +82,7 @@ void PageTable::Update()
 	for (size_t i = 0; i < level + 1; ++i)
 	{
 		m_root->Write(m_data[i].w, m_data[i].h, m_data[i].data, i);
-		auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-		rc.UpdateTexture(m_texid, m_data[i].data, m_data[i].w, m_data[i].h, 0, i, 
-            ur::TEXTURE_REPEAT, ur::TEXTURE_NEAREST);
+        m_tex->Upload(m_data[i].data, 0, 0, m_data[i].w, m_data[i].h, i);
 	}
 }
 

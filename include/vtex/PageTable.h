@@ -1,11 +1,14 @@
 #pragma once
 
+#include <unirender2/typedef.h>
+
 #include <boost/noncopyable.hpp>
 
 #include <memory>
 #include <vector>
 
 namespace textile { struct Page; }
+namespace ur2 { class Device; }
 
 namespace vtex
 {
@@ -13,15 +16,14 @@ namespace vtex
 class PageTable : private boost::noncopyable
 {
 public:
-	PageTable(int width, int height);
-	~PageTable();
+	PageTable(const ur2::Device& dev, int width, int height);
 
 	void AddPage(const textile::Page& page, int mapping_x, int mapping_y);
 	void RemovePage(const textile::Page& page);
 
 	void Update();
 
-	uint32_t GetTexID() const { return m_texid; }
+    auto GetTexture() const { return m_tex; }
 
 private:
 	struct Image
@@ -77,7 +79,7 @@ private:
 
 	std::vector<Image> m_data;
 
-	uint32_t m_texid;
+    ur2::TexturePtr m_tex = nullptr;
 
 }; // PageTable
 

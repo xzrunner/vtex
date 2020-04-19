@@ -1,7 +1,8 @@
 #include "vtex/FeedbackBuffer.h"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
+#include <unirender2/Device.h>
+#include <unirender2/Framebuffer.h>
+#include <unirender2/TextureDescription.h>
 #include <painting2/RenderTarget.h>
 #include <textile/PageIndexer.h>
 
@@ -10,14 +11,26 @@
 namespace vtex
 {
 
-FeedbackBuffer::FeedbackBuffer(int size, int page_table_w, int page_table_h,
-	                           const textile::PageIndexer& indexer)
+FeedbackBuffer::FeedbackBuffer(const ur2::Device& dev, int size, int page_table_w,
+                               int page_table_h, const textile::PageIndexer& indexer)
 	: m_size(size)
 	, m_page_table_w(page_table_w)
     , m_page_table_h(page_table_h)
 	, m_indexer(indexer)
 {
-	m_rt = std::make_unique<pt2::RenderTarget>(m_size, m_size, true);
+    ur2::TextureDescription desc;
+    desc.target = ur2::TextureTarget::Texture2D;
+    desc.width  = m_size;
+    desc.height = m_size;
+    desc.format = ur2::TextureFormat::RGBA8;
+    m_fbo_col_tex = dev.CreateTexture(desc, nullptr);
+    desc.format = ur2::TextureFormat::DEPTH;
+    m_fbo_depth_tex = dev.CreateTexture(desc, nullptr);
+
+    m_fbo = dev.CreateFramebuffer();
+    m_fbo->SetAttachment(ur2::AttachmentType::Color0, ur2::TextureTarget::Texture2D, m_fbo_col_tex, nullptr);
+    m_fbo->SetAttachment(ur2::AttachmentType::Depth, ur2::TextureTarget::Texture2D, m_fbo_depth_tex, nullptr);
+
 	m_data = new uint8_t[m_size * m_size * 4];
 
 	m_requests.resize(indexer.GetPageCount(), 0);
@@ -30,18 +43,16 @@ FeedbackBuffer::~FeedbackBuffer()
 
 void FeedbackBuffer::BindRT()
 {
-	m_rt->Bind();
+    m_fbo->Bind();
 }
 
 void FeedbackBuffer::UnbindRT()
 {
-	m_rt->Unbind();
 }
 
-void FeedbackBuffer::Download()
+void FeedbackBuffer::Download(const ur2::Device& dev)
 {
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	rc.ReadPixels(m_data, 4, 0, 0, m_size, m_size);
+    dev.ReadPixels(m_data, ur2::TextureFormat::RGBA8, 0, 0, m_size, m_size);
 
     int page_table_size_log2 = static_cast<int>(std::log2(std::min(m_page_table_w, m_page_table_h)));
 	for (int i = 0, n = m_size * m_size; i < n; ++i)
@@ -70,11 +81,6 @@ void FeedbackBuffer::Download()
 void FeedbackBuffer::Clear()
 {
 	std::fill(m_requests.begin(), m_requests.end(), 0);
-}
-
-uint32_t FeedbackBuffer::GetTexID() const
-{
-	return m_rt->GetTexID();
 }
 
 }

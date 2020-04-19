@@ -13,7 +13,7 @@
 #include <vector>
 #include <functional>
 
-namespace ur { class Shader; }
+namespace ur2 { class Device; class Context; class ShaderProgram; }
 
 namespace vtex
 {
@@ -21,10 +21,11 @@ namespace vtex
 class VirtualTexture : private boost::noncopyable
 {
 public:
-	VirtualTexture(const std::string& filepath, const textile::VTexInfo& info,
-		int atlas_channel, int feedback_size);
+	VirtualTexture(const ur2::Device& dev, const std::string& filepath,
+        const textile::VTexInfo& info, int atlas_channel, int feedback_size);
 
-	void Draw(std::function<void()> draw_cb);
+	void Draw(const ur2::Device& dev, ur2::Context& ctx,
+        std::function<void()> draw_cb);
 
 	void ClearCache() { m_cache.Clear(); }
 	textile::PageLoader& GetPageLoader() { return m_loader; }
@@ -35,9 +36,10 @@ public:
     auto Height() const { return m_vtex_h; }
 
 private:
-	void InitShaders();
+	void InitShaders(const ur2::Device& dev);
 
-	void Update(const std::vector<int>& requests);
+	void Update(const ur2::Device& dev,
+        const std::vector<int>& requests);
 
 private:
 	struct PageWithCount
@@ -55,8 +57,8 @@ private:
 
 	textile::VTexInfo m_info;
 
-	std::shared_ptr<ur::Shader> m_feedback_shader = nullptr;
-	std::shared_ptr<ur::Shader> m_final_shader = nullptr;
+	std::shared_ptr<ur2::ShaderProgram> m_feedback_shader = nullptr;
+	std::shared_ptr<ur2::ShaderProgram> m_final_shader = nullptr;
 
 	TextureAtlas m_atlas;
 
