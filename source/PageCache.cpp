@@ -15,7 +15,7 @@ PageCache::PageCache(TextureAtlas& atlas, textile::PageLoader& loader,
 {
 }
 
-void PageCache::LoadComplete(const ur2::Device& dev, const textile::Page& page, const uint8_t* data)
+void PageCache::LoadComplete(const ur::Device& dev, const textile::Page& page, const uint8_t* data)
 {
 	int x, y;
 

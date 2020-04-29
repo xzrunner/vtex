@@ -1,12 +1,12 @@
 #pragma once
 
-#include <unirender2/typedef.h>
+#include <unirender/typedef.h>
 
 #include <boost/noncopyable.hpp>
 
 #include <cstdint>
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace vtex
 {
@@ -14,7 +14,7 @@ namespace vtex
 class TextureAtlas : private boost::noncopyable
 {
 public:
-	TextureAtlas(const ur2::Device& dev, size_t atlas_size,
+	TextureAtlas(const ur::Device& dev, size_t atlas_size,
         size_t page_size, int tex_channel);
 
 	int GetSize() const { return m_atlas_size; }
@@ -34,7 +34,7 @@ private:
 
 	int m_tex_channel;
 
-    ur2::TexturePtr m_tex = nullptr;
+    ur::TexturePtr m_tex = nullptr;
 
 }; // TextureAtlas
 

@@ -1,8 +1,8 @@
 #include "vtex/PageTable.h"
 
-#include <unirender2/Device.h>
-#include <unirender2/Texture.h>
-#include <unirender2/TextureDescription.h>
+#include <unirender/Device.h>
+#include <unirender/Texture.h>
+#include <unirender/TextureDescription.h>
 #include <textile/PageIndexer.h>
 
 #include <algorithm>
@@ -12,7 +12,7 @@
 namespace vtex
 {
 
-PageTable::PageTable(const ur2::Device& dev, int width, int height)
+PageTable::PageTable(const ur::Device& dev, int width, int height)
 	: m_width(width)
     , m_height(height)
 {
@@ -32,11 +32,11 @@ PageTable::PageTable(const ur2::Device& dev, int width, int height)
 		memset(data.data, 0, sw * sh * 4);
 	}
 
-    ur2::TextureDescription desc;
-    desc.target = ur2::TextureTarget::Texture2D;
+    ur::TextureDescription desc;
+    desc.target = ur::TextureTarget::Texture2D;
     desc.width  = m_width;
     desc.height = m_height;
-    desc.format = ur2::TextureFormat::RGBA8;
+    desc.format = ur::TextureFormat::RGBA8;
     m_tex = dev.CreateTexture(desc, nullptr);
 }
 

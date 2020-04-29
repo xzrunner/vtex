@@ -2,11 +2,11 @@
 #include "vtex/feedback.frag"
 #include "vtex/final.frag"
 
-#include <unirender2/ShaderProgram.h>
-#include <unirender2/Device.h>
-#include <unirender2/Context.h>
-#include <unirender2/Uniform.h>
-#include <unirender2/Texture.h>
+#include <unirender/ShaderProgram.h>
+#include <unirender/Device.h>
+#include <unirender/Context.h>
+#include <unirender/Uniform.h>
+#include <unirender/Texture.h>
 #include <painting2/DebugDraw.h>
 #include <painting3/Blackboard.h>
 #include <painting3/WindowContext.h>
@@ -45,7 +45,7 @@ void main()
 namespace vtex
 {
 
-VirtualTexture::VirtualTexture(const ur2::Device& dev,
+VirtualTexture::VirtualTexture(const ur::Device& dev,
                                const std::string& filepath,
 	                           const textile::VTexInfo& info,
 	                           int atlas_channel,
@@ -65,7 +65,7 @@ VirtualTexture::VirtualTexture(const ur2::Device& dev,
 	InitShaders(dev);
 }
 
-void VirtualTexture::Draw(const ur2::Device& dev, ur2::Context& ctx, std::function<void()> draw_cb)
+void VirtualTexture::Draw(const ur::Device& dev, ur::Context& ctx, std::function<void()> draw_cb)
 {
 	// pass 1
 
@@ -122,7 +122,7 @@ void VirtualTexture::DecreaseMipBias()
     u_mip_sample_bias->SetValue(&bias, 1);
 }
 
-void VirtualTexture::InitShaders(const ur2::Device& dev)
+void VirtualTexture::InitShaders(const ur::Device& dev)
 {
 	//CU_VEC<ur::VertexAttrib> layout;
 	//layout.push_back(ur::VertexAttrib("position", 3, 4, 32, 0));
@@ -190,7 +190,7 @@ void VirtualTexture::InitShaders(const ur2::Device& dev)
 	}
 }
 
-void VirtualTexture::Update(const ur2::Device& dev,
+void VirtualTexture::Update(const ur::Device& dev,
                             const std::vector<int>& requests)
 {
 	m_toload.clear();
