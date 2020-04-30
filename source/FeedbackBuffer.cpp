@@ -43,7 +43,7 @@ FeedbackBuffer::~FeedbackBuffer()
 
 void FeedbackBuffer::BindRT()
 {
-    m_fbo->Bind();
+//    m_fbo->Bind();
 }
 
 void FeedbackBuffer::UnbindRT()
