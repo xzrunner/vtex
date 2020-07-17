@@ -7,6 +7,7 @@
 #include <unirender/Context.h>
 #include <unirender/Uniform.h>
 #include <unirender/Texture.h>
+#include <shadertrans/ShaderTrans.h>
 #include <painting2/DebugDraw.h>
 #include <painting3/Blackboard.h>
 #include <painting3/WindowContext.h>
@@ -140,7 +141,10 @@ void VirtualTexture::InitShaders(const ur::Device& dev)
 
 	// feedback
 	{
-        m_feedback_shader = dev.CreateShaderProgram(default_vs, feedback_frag);
+		std::vector<unsigned int> vs, fs;
+		shadertrans::ShaderTrans::GLSL2SpirV(shadertrans::ShaderStage::VertexShader, default_vs, vs);
+		shadertrans::ShaderTrans::GLSL2SpirV(shadertrans::ShaderStage::PixelShader, feedback_frag, fs);
+        m_feedback_shader = dev.CreateShaderProgram(vs, fs);
 
         auto u_page_table_size = m_feedback_shader->QueryUniform("u_page_table_size");
         assert(u_page_table_size);
@@ -161,7 +165,10 @@ void VirtualTexture::InitShaders(const ur::Device& dev)
 		//textures.push_back("u_page_table_tex");
 		//textures.push_back("u_texture_atlas_tex");
 
-        m_final_shader = dev.CreateShaderProgram(default_vs, final_frag);
+		std::vector<unsigned int> vs, fs;
+		shadertrans::ShaderTrans::GLSL2SpirV(shadertrans::ShaderStage::VertexShader, default_vs, vs);
+		shadertrans::ShaderTrans::GLSL2SpirV(shadertrans::ShaderStage::PixelShader, final_frag, fs);
+        m_final_shader = dev.CreateShaderProgram(vs, fs);
 
         auto u_page_table_size = m_final_shader->QueryUniform("u_page_table_size");
         assert(u_page_table_size);

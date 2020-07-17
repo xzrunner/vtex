@@ -71,7 +71,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\shadertrans\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -85,7 +85,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\textile\include;..\..\..\..\unirender\include;..\..\..\..\painting2\include;..\..\..\..\painting3\include;..\..\..\..\multitask\include;..\..\..\..\shadertrans\include;..\..\..\..\external\boost\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
